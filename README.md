@@ -47,7 +47,7 @@ swo -a
 #### Search for Job
 
 ```bash
-swo -j EA-12-123123
+swo -j JOBNUMBER
 ```
 
 #### Options
