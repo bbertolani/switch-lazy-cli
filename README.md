@@ -2,7 +2,7 @@
 
 ## About
 
-I started with this project because I wanted to search job logs on Switch quickly and simply. If you work most part of the time coding and switching between GUI and Terminal you know how to bother is to go to Switch to look at the logs
+I started with this project because I would like to search work logs on Switch quickly and simply. If you work most of your time coding and switching between GUI and Terminal, you know how bothering it is to go to Switch to see the logs.
 
 ![](./assets/swo.png)
 
