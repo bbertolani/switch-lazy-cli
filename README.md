@@ -4,6 +4,8 @@
 
 I started with this project because I wanted to search job logs on Switch quickly and simply. If you work most part of the time coding and switching between GUI and Terminal you know how to bother is to go to Switch to look at the logs
 
+![](./assets/swo.png)
+
 ### Requirements
 
 Switch Orchestrator uses a few simple tools that you probably already have installed.
@@ -32,7 +34,6 @@ Please read the oficial manual of [Enfocus Switch API](https://www.enfocus.com/m
 USER="log"
 HASH_PASS="XXXXXXXXXXXXXXXX"
 SWITCH_IP="0.0.0.0"
-
 ```
 
 #### Auth
