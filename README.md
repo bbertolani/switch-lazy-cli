@@ -13,7 +13,9 @@ A text editor (such as Vim or Emacs)
 A program to print files (like cat)
 Basic programs that should be included in almost all Linux/Unix distributions, including mkdir, touch, mv, rm, echo, printf
 But I order to optimize the developement two libraries are required, specially for deal with json files.
+
 JQ <https://github.com/stedolan/jq>
+
 JTBL <https://kellyjonbrazil.github.io/jtbl/>
 
 ### Usage
