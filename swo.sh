@@ -23,15 +23,38 @@ Help() {
 Switch Orchestrator
 Usage: swo [<args>]
 Arguments:
-  -h | --help                         Display usage guide.
-  -j | --job    <JOBNUMBER>           Search about a specific job.
+  -h | --help                           Display usage guide.
+  -c | --config                         Create config filep
+  -a | --auth                           Get token from Switch dont forget the config file
+  -j | --job    <JOBNUMBER>             Search about a specific job.
 switchOrchestrator loads configuration variables from:
     \$HOME/.config/switchOrchestrator/swo"
     exit 0
 }
 
-install() {
-    exec mkdir $SWITCH_CF_FOLDER
+createConf() {
+    if [ ! -d "$SWITCH_CF_FOLDER" ]; then
+        echo "Creating config folder in ${SWITCH_CF_FOLDER}..."
+        exec mkdir $SWITCH_CF_FOLDER
+    fi
+
+    cd $SWITCH_CF_FOLDER
+
+    if [ -f "$SWITCH_CF_FILE" ]; then
+        echo "$SWITCH_CF_FILE exists."
+        read -p "Are you sure that wanna replace your config? [Yy][Nn]" -n 1 -r
+        if [[ $REPLY =~ [^Yy]$ ]]; then
+            echo "Install failed"
+            break
+        fi
+        cp $SWITCH_CF_FILE "${SWITCH_CF_FILE}_bkp"
+        truncate -s 0 $SWITCH_CF_FILE
+    fi
+
+    echo 'USER="XYZ"' >> $SWITCH_CF_FILE
+    echo 'HASH_PASS="XXXXXXXXXXXXXXXX"'  >> $SWITCH_CF_FILE
+    echo 'SWITCH_IP="0.0.0.0"' >> $SWITCH_CF_FILE
+    exit 0
 }
 
 auth() {
@@ -53,14 +76,14 @@ auth() {
 }
 
 searchJob() {
-    JSON=$(curl -s --location --request GET "$SWITCH_ADR/api/v1/messages?type=info&message=$JOB_NUMBER&limit=100" -H 'Authorization: Bearer '$TOKEN)
+    JSON=$(curl -s --location --request GET "$SWITCH_ADR/api/v1/messages?type=info&type=error&type=warning&type=debug&message=$JOB_NUMBER&limit=100" -H 'Authorization: Bearer '$TOKEN)
     status=$(jq '.status' <<< $JSON)
     if [ "$status" == "success" ]; then
         echo "Search failed"
         exit 1
     fi
     messages=$(jq '.messages' <<< $JSON)
-    echo $messages | jq '[.[] | {timestamp,flow,job,element,message}] | sort_by(.timestamp)' | jtbl
+    echo $messages | jq '[.[] | {type,flow,job,element,message,timestamp}] | sort_by(.timestamp)' | jtbl
     exit 0
 }
 
@@ -95,8 +118,8 @@ if (($# > 0)); then
                 auth
                 shift
             ;;
-            -i | --install)
-                install
+            -c | --config)
+                createConf
             ;;
             -h | --help)
                 Help
