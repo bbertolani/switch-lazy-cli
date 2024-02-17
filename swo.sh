@@ -52,9 +52,9 @@ createConf() {
         truncate -s 0 $SWITCH_CF_FILE
     fi
 
-    echo 'USER="XYZ"' >> $SWITCH_CF_FILE
-    echo 'HASH_PASS="XXXXXXXXXXXXXXXX"'  >> $SWITCH_CF_FILE
-    echo 'SWITCH_IP="0.0.0.0"' >> $SWITCH_CF_FILE
+    echo 'USER="XYZ"' >>$SWITCH_CF_FILE
+    echo 'HASH_PASS="XXXXXXXXXXXXXXXX"' >>$SWITCH_CF_FILE
+    echo 'SWITCH_IP="0.0.0.0"' >>$SWITCH_CF_FILE
     exit 0
 }
 
@@ -62,16 +62,16 @@ auth() {
     echo $SWITCH_ADR
     JSON=$(curl -s POST $SWITCH_ADR/login -H 'Content-Type: application/json' -d '{"username": "'$USER'", "password": "'$HASH_PASS'"}')
 
-    result=$(jq -r '.success' <<< $JSON)
+    result=$(jq -r '.success' <<<$JSON)
     if [ "$result" == "false" ]; then
         echo "Login failed"
         exit 1
     fi
-    TOKEN=$(jq -r '.token' <<< $JSON)
+    TOKEN=$(jq -r '.token' <<<$JSON)
     SAVED_TOKEN=$SWITCH_CF_FOLDER/swo_$SWITCH_IP
     touch $SAVED_TOKEN
     truncate -s 0 $SAVED_TOKEN
-    echo "$TOKEN" >> $SAVED_TOKEN
+    echo "$TOKEN" >>$SAVED_TOKEN
     echo "Login Sucessful | SWITCH: $SWITCH_IP"
     checkRequirements
     exit 0
@@ -79,12 +79,12 @@ auth() {
 
 searchJob() {
     JSON=$(curl -s --location --request GET "$SWITCH_ADR/api/v1/messages?type=info&type=error&type=warning&type=debug&message=$JOB_NUMBER&limit=100" -H 'Authorization: Bearer '$TOKEN)
-    status=$(jq '.status' <<< $JSON)
+    status=$(jq '.status' <<<$JSON)
     if [ "$status" == "success" ]; then
         echo "Search failed OR you're not logged, try to auth again"
         exit 1
     fi
-    messages=$(jq '.messages' <<< $JSON)
+    messages=$(jq '.messages' <<<$JSON)
     echo $messages | jq '[.[] | {type,flow,job,element,message,timestamp}] | sort_by(.timestamp)' | jtbl
     exit 0
 }
@@ -103,11 +103,24 @@ validateSearchJob() {
     searchJob $JOB_NUMBER
 }
 
+listFlows() {
+    JSON=$(curl -s --location --request GET "$SWITCH_ADR/api/v1/flows?fields=status,name,groups" -H 'Authorization: Bearer '$TOKEN)
+    messages=$(jq <<<$JSON)
+    echo $messages | jq 'map(
+        .status |= if . == "stopped" then "\u001b[31m" + . + "\u001b[0m"
+                    elif . == "running" then "\u001b[32m" + . + "\u001b[0m"
+                    else . end
+        | select(.groups | length == 1)
+        | .groups |= .[0].name
+    ) | sort_by(.groups, .name)' | jtbl
+    exit 0
+}
+
 checkRequirements() {
-    if ! command -v jq &> /dev/null; then
-    echo "jq is not installed. Please install it before running this script."
-    exit 1
-fi
+    if ! command -v jq &>/dev/null; then
+        echo "jq is not installed. Please install it before running this script."
+        exit 1
+    fi
 }
 
 ############################################################
@@ -120,23 +133,26 @@ if (($# > 0)); then
     while [[ $# -gt 0 ]]; do
         key="$1"
         case $key in
-            -j | --job)
-                validateSearchJob "$@"
+        -j | --job)
+            validateSearchJob "$@"
             ;;
-            -a | --auth)
-                auth
-                shift
+        -a | --auth)
+            auth
+            shift
             ;;
-            -c | --config)
-                createConf
+        -c | --config)
+            createConf
             ;;
-            -h | --help)
-                Help
+        -f | --flows)
+            listFlows
             ;;
-            *)
-                printf "Unknown Argument \"%s\"\n" "$1"
-                printf "Use \"swo --help\" to see usage information.\n"
-                exit 1
+        -h | --help)
+            Help
+            ;;
+        *)
+            printf "Unknown Argument \"%s\"\n" "$1"
+            printf "Use \"swo --help\" to see usage information.\n"
+            exit 1
             ;;
         esac
     done

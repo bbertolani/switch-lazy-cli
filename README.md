@@ -70,6 +70,7 @@ swo -j JOBNUMBER
 | `-j <string> --job <string>` | search a job          |
 | `-h --help`                  | display help dialog   |
 | `-i --install`               | create config folders |
+| `-f --flows`                 | list flows and status |
 
 ### How do I contribute to Switch Orchestrator?
 
@@ -92,7 +93,7 @@ I'm far from expert and suspect there are many ways to improve. If you have idea
 - [X] Search by Jobs
 - [ ] Search with different parameters
 - [ ] Refresh Search
-- [ ] List Workflow
+- [X] List Workflow
 - [ ] Start/Stop workflow
 - [ ] Multiple Switch
 - [ ] Environment ?
