@@ -33,16 +33,17 @@ switchOrchestrator loads configuration variables from:
 }
 
 createConf() {
-    if [ ! -d "$SWITCH_CF_FOLDER" ]; then
-        echo "Creating config folder in ${SWITCH_CF_FOLDER}..."
-        exec mkdir $SWITCH_CF_FOLDER
-    fi
+    # if [ ! -d "$SWITCH_CF_FOLDER" ]; then
+    #     echo "Creating config folder in ${SWITCH_CF_FOLDER}..."
+    #     exec mkdir $SWITCH_CF_FOLDER
+    # fi
+    mkdir -p "$SWITCH_CF_FOLDER"
 
     cd $SWITCH_CF_FOLDER
 
     if [ -f "$SWITCH_CF_FILE" ]; then
         echo "$SWITCH_CF_FILE exists."
-        read -p "Are you sure that wanna replace your config? [Yy][Nn]" -n 1 -r
+        read -p "Are you sure you want to replace your config? [Yy][Nn]" -n 1 -r
         if [[ $REPLY =~ [^Yy]$ ]]; then
             echo "Install failed"
             break
@@ -72,6 +73,7 @@ auth() {
     truncate -s 0 $SAVED_TOKEN
     echo "$TOKEN" >> $SAVED_TOKEN
     echo "Login Sucessful | SWITCH: $SWITCH_IP"
+    checkRequirements
     exit 0
 }
 
@@ -79,7 +81,7 @@ searchJob() {
     JSON=$(curl -s --location --request GET "$SWITCH_ADR/api/v1/messages?type=info&type=error&type=warning&type=debug&message=$JOB_NUMBER&limit=100" -H 'Authorization: Bearer '$TOKEN)
     status=$(jq '.status' <<< $JSON)
     if [ "$status" == "success" ]; then
-        echo "Search failed"
+        echo "Search failed OR you're not logged, try to auth again"
         exit 1
     fi
     messages=$(jq '.messages' <<< $JSON)
@@ -99,6 +101,13 @@ validateSearchJob() {
         exit 1
     fi
     searchJob $JOB_NUMBER
+}
+
+checkRequirements() {
+    if ! command -v jq &> /dev/null; then
+    echo "jq is not installed. Please install it before running this script."
+    exit 1
+fi
 }
 
 ############################################################

@@ -32,6 +32,7 @@ sudo cp swo.sh /usr/local/bin/swo
 ```
 
 Create a file `swo_config` on `$HOME/.config/switchOrchestrator`
+
 Please read the oficial manual of [Enfocus Switch API](https://www.enfocus.com/manuals/DeveloperGuide/WebServices/17/index.html#api-Authentication-LoginQuery) to learn how create a password hash
 
 ```bash
@@ -39,6 +40,13 @@ USER="log"
 HASH_PASS="XXXXXXXXXXXXXXXX"
 SWITCH_IP="0.0.0.0"
 ```
+
+#### Password Hash
+
+In terminal go to a new folder.
+Create a public_key.pem file and copy the PUBLIC KEY offered by Enfocus Switch [Click Here](https://www.enfocus.com/manuals/DeveloperGuide/WebServices/17/index.html#api-Authentication-LoginQuery)
+
+``` ➜ echo -n "REPLACEYOURPASSEHRE" | openssl rsautl -encrypt -pubin -inkey ./public_key.pem | base64```
 
 #### Auth
 
