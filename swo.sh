@@ -147,8 +147,9 @@ ping() {
         exit 1
     fi
     output=$(jq <<<$JSON)
-    if [[ "$(jq -r '.data' <<<"$output")" == "1" || -z "$(jq -r '.data' <<<"$output")" ]]; then
-        echo Unauthorized or not Available
+    if [[ $(jq -r '.data' <<<"$output") == "1" ]]; then
+        echo "Unauthorized / Not Available / Not Reachable"
+        echo "Note: Switch API is not available, but the Switch App may be running"
         auth
     fi
     status=$(jq -r '.status' <<<"$output")
