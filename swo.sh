@@ -60,7 +60,11 @@ createConf() {
 
 auth() {
     echo $SWITCH_ADR
-    JSON=$(curl -s POST $SWITCH_ADR/login -H 'Content-Type: application/json' -d '{"username": "'$USER'", "password": "'$HASH_PASS'"}')
+    JSON=$(curl -s POST $SWITCH_ADR/login -H 'Content-Type: application/json' -d '{"username": "'$USER'", "password": "'$HASH_PASS'"}' --max-time 5)
+    if [ $? -ne 0 ]; then
+        echo "Login failed: Timeout"
+        exit 1
+    fi
 
     result=$(jq -r '.success' <<<$JSON)
     if [ "$result" == "false" ]; then
@@ -78,7 +82,11 @@ auth() {
 }
 
 searchJob() {
-    JSON=$(curl -s --location --request GET "$SWITCH_ADR/api/v1/messages?type=info&type=error&type=warning&type=debug&message=$JOB_NUMBER&limit=100" -H 'Authorization: Bearer '$TOKEN)
+    JSON=$(curl -s --location --request GET "$SWITCH_ADR/api/v1/messages?type=info&type=error&type=warning&type=debug&message=$JOB_NUMBER&limit=100" -H 'Authorization: Bearer '$TOKEN --max-time 10)
+    if [ $? -ne 0 ]; then
+        echo "Login failed: Timeout"
+        exit 1
+    fi
     status=$(jq '.status' <<<$JSON)
     if [ "$status" == "success" ]; then
         echo "Search failed OR you're not logged, try to auth again"
@@ -104,7 +112,11 @@ validateSearchJob() {
 }
 
 listFlows() {
-    JSON=$(curl -s --location --request GET "$SWITCH_ADR/api/v1/flows?fields=status,name,groups" -H 'Authorization: Bearer '$TOKEN)
+    JSON=$(curl -s --location --request GET "$SWITCH_ADR/api/v1/flows?fields=status,name,groups" -H 'Authorization: Bearer '$TOKEN --max-time 5)
+    if [ $? -ne 0 ]; then
+        echo "Login failed: Timeout"
+        exit 1
+    fi
     messages=$(jq <<<$JSON)
     echo $messages | jq 'map(
         .status |= if . == "stopped" then "\u001b[31m" + . + "\u001b[0m"
@@ -117,15 +129,33 @@ listFlows() {
 }
 
 checkRequirements() {
-    if ! command -v jq &> /dev/null; then
+    if ! command -v jq &>/dev/null; then
         echo "jq is not installed. Please install it before running this script."
         exit 1
     fi
 
-    if ! command -v jtbl &> /dev/null; then
+    if ! command -v jtbl &>/dev/null; then
         echo "jtbl is not installed. Please install it before running this script."
         exit 1
     fi
+}
+
+ping() {
+    JSON=$(curl -s --location --request GET "$SWITCH_ADR/api/v1/ping" -H 'Authorization: Bearer '$TOKEN --max-time 5)
+    if [ $? -ne 0 ]; then
+        echo "Login failed: Timeout"
+        exit 1
+    fi
+    output=$(jq <<<$JSON)
+    if [[ "$(jq -r '.data' <<<"$output")" == "1" || -z "$(jq -r '.data' <<<"$output")" ]]; then
+        echo Unauthorized or not Available
+        auth
+    fi
+    status=$(jq -r '.status' <<<"$output")
+    echo ---
+    echo Switch API Status: $status
+    echo ---
+    exit 0
 }
 
 ############################################################
@@ -153,6 +183,9 @@ if (($# > 0)); then
             ;;
         -h | --help)
             Help
+            ;;
+        -p | --ping)
+            ping
             ;;
         *)
             printf "Unknown Argument \"%s\"\n" "$1"
