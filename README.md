@@ -1,14 +1,14 @@
-# Switch Orchestrator
+# switch-lazy-cli
 
 ## About
 
-Switch Orchestrator is a command-line tool designed to simplify the process of searching work logs on Enfocus Switch. If you spend a significant amount of time coding and frequently switch between GUI and Terminal, you understand the inconvenience of navigating to Switch to check logs.
+switch-lazy-cli is a command-line tool designed to simplify the process of searching work logs on Enfocus Switch. If you spend a significant amount of time coding and frequently switch between GUI and Terminal, you understand the inconvenience of navigating to Switch to check logs.
 
 ![](./assets/swo.png)
 
 ### Requirements
 
-Switch Orchestrator relies on a few basic tools commonly found on Linux/Unix systems. 
+switch-lazy-cli relies on a few basic tools commonly found on Linux/Unix systems. 
 Ensure you have a text editor (like Vim or Emacs), a program to print files (such as cat), and essential utilities like mkdir, touch, mv, rm, echo, and printf. 
 Additionally, two libraries, JQ and JTBL, are needed for optimal development.
 
@@ -72,7 +72,7 @@ This command initiates the authentication process and saves the resulting token.
 ```bash
 swo -j JOBNUMBER
 ```
-This command retrieves the type, flow name, job, element, message, and timestamp associated with the specified job number or string. It allows you to quickly and efficiently retrieve detailed information about a specific job in the Switch Orchestrator logs.
+This command retrieves the type, flow name, job, element, message, and timestamp associated with the specified job number or string. It allows you to quickly and efficiently retrieve detailed information about a specific job in the switch-lazy-cli logs.
 
 ```bash
 ^ type   ^ flow                  ^ job                  ^ element                       ^ message                                                                  ^ timestamp                ^
@@ -112,7 +112,7 @@ This command retrieves and displays information about the status, name, and grou
 | `-i --install`               | create config folders |
 | `-f --flows`                 | list flows and status |
 
-### How do I contribute to Switch Orchestrator?
+### How do I contribute to switch-lazy-cli?
 
 I'm far from expert and suspect there are many ways to improve. If you have ideas on how to make this project better, don't hesitate to fork and send pull requests!
 
