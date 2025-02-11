@@ -1,7 +1,6 @@
-# switch-lazy-cli
+# **switch-lazy-cli**
 
-## About
-
+## **About**
 **Switch Lazy CLI** is a command-line tool designed to simplify the process of searching work logs on **Enfocus Switch**. If you frequently switch between a GUI and the terminal while coding, you know how inconvenient it can be to check logs manually. This tool streamlines the process, allowing you to access logs quickly and efficiently.
 
 ![Switch Lazy CLI](./assets/swo.png)
@@ -33,7 +32,6 @@ First, clone this repository:
 git clone https://github.com/yourusername/switch-lazy-cli.git
 cd switch-lazy-cli
 ```
-
 ### Make the Script Executable
 Navigate to the folder where `slazy.sh` is located and make it executable:
 
@@ -92,6 +90,51 @@ To authenticate, you need to generate an encrypted password hash.
 ## Usage
 
 ### Authentication
+=======
+---
+
+## **Configuration**
+
+### **Create Configuration File**
+1. Create a configuration file at:  
+   ```
+   $HOME/.config/switchOrchestrator/swo_config
+   ```
+   Or run:
+   ```bash
+   swo -c
+   ```
+
+2. Add the following information to the configuration file:
+
+   ```bash
+   USER="joe"
+   HASH_PASS="XXXXXXXXXXXXXXXX"
+   SWITCH_IP="0.0.0.0"
+   ```
+
+### **Password Hash (Authentication)**
+
+To authenticate, you need to generate an encrypted password hash.
+
+#### **Steps:**
+1. Create a `enfocuspublic_key.pem` file.
+2. Copy the **PUBLIC KEY** from the [Enfocus Switch - Auth Documentation](https://www.enfocus.com/manuals/DeveloperGuide/WebServices/17/index.html#api-Authentication-LoginQuery).
+3. Run the following command to encrypt your password:
+
+   ```bash
+   echo -n "REPLACEYOURPASSWORDHERE" | openssl rsautl -encrypt -pubin -inkey ./enfocuspublic_key.pem | base64
+   ```
+
+> ⚠ **Warning:**  
+> If you are unfamiliar with **RSA encryption**, research before proceeding. Encryption operations should be performed at your own risk.  
+> [Check it](https://letmegooglethat.com/?q=Encrypt+rsa+password+online)
+
+---
+
+## **Usage**
+
+### **Authentication**
 Authenticate and generate an authentication token:
 
 ```bash
@@ -101,6 +144,7 @@ slazy -a
 ---
 
 ### Search for a Job
+
 Retrieve details about a specific job:
 
 ```bash
@@ -118,7 +162,9 @@ slazy -j JOBNUMBER
 
 ---
 
+
 ### List Existing Flows
+
 Retrieve the status, name, and groups of existing flows:
 
 ```bash
@@ -161,11 +207,11 @@ If you have ideas, feel free to **fork** the repository and send a **pull reques
 ---
 
 ## Author
-
 👤 **Bruno Bertolani**  
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-BrunoBertolani-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/brunosbertolani/)
 
 ---
+
 
 ## References & Research
 
@@ -176,8 +222,8 @@ If you have ideas, feel free to **fork** the repository and send a **pull reques
 
 ---
 
-## Planned Features 🚀
 
+## Planned Features 🚀
 - [x] Authentication
 - [x] Search by Jobs
 - [ ] Search using different parameters
